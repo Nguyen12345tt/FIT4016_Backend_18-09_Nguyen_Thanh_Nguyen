@@ -54,8 +54,7 @@ public class StudentService : IStudentService
             LastName = studentDto.LastName,
             Email = studentDto.Email,
             Major = studentDto.Major,
-            GPA = studentDto.GPA,
-            EnrollmentDate = DateTime.Now
+            GPA = studentDto.GPA
         };
 
         return _repository.Create(student);
