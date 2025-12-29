@@ -1,0 +1,21 @@
+@model List<PostManagementApp.Models.Post>
+<h1>Danh sách bài đăng</h1>
+<a asp-action="Create" class="btn btn-primary">Tạo mới</a>
+<table class="table mt-3">
+<tr>
+    <th>ID</th><th>Tiêu đề</th><th>Hành động</th>
+</tr>
+@foreach (var post in Model)
+{
+<tr>
+    <td>@post.Id</td>
+    <td>@post.Title</td>
+    <td>
+        <a asp-action="Details" asp-route-id="@post.Id">Chi tiết</a> |
+        <a asp-action="Edit" asp-route-id="@post.Id">Sửa</a> |
+        <a asp-action="Delete" asp-route-id="@post.Id"
+           onclick="return confirm('Xóa?')">Xóa</a>
+    </td>
+</tr>
+}
+</table>

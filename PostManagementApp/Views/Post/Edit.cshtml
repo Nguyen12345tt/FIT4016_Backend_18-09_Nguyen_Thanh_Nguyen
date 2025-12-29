@@ -1,0 +1,16 @@
+@model PostManagementApp.Models.Post
+<h1>Sửa bài đăng</h1>
+<form asp-action="Edit" asp-route-id="@Model.Id" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+    <div>
+
+        <label>Tiêu đề</label>
+        <input asp-for="Title" class="form-control" />
+    </div>
+    <div>
+        <label>Nội dung</label>
+        <textarea asp-for="Content" class="form-control"></textarea>
+    </div>
+    <button type="submit">Cập nhật</button>
+</form>
