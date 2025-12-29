@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASP.NET Core MVC & Validation</title>
+    <style>
+        :root {
+            --color-bg-dark: #0f172a;
+            --color-bg-light: #1e293b;
+            --color-text-light: #f1f5f9;
+            --color-accent: #38bdf8;
+            --color-success: #22c55e;
+            --color-warning: #f59e0b;
+            --color-error: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 16px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--color-text-light);
+            background-color: var(--color-bg-dark);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .slide {
+            width: 960px;
+            height: 540px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            left: 0;
+            right: 0;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            padding: 60px;
+            background: linear-gradient(135deg, var(--color-bg-dark) 0%, var(--color-bg-light) 100%);
+        }
+
+        .slide.active {
+            opacity: 1;
+            z-index: 10;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            color: var(--color-accent);
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            color: var(--color-accent);
+            text-align: center;
+        }
+
+        h3 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: var(--color-accent);
+        }
+
+        p, li {
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+            color: var(--color-text-light);
+        }
+
+        ul, ol {
+            margin-left: 40px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 10px;
+            line-height: 1.8;
+        }
+
+        code {
+            background-color: #0a0e27;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #86efac;
+            font-size: 0.95rem;
+        }
+
+        .code-block {
+            background-color: #0a0e27;
+            border-left: 4px solid var(--color-accent);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+
+        .code-block pre {
+            margin: 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: #cbd5e1;
+            line-height: 1.5;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .two-column {
+            display: flex;
+            gap: 30px;
+            margin: 20px 0;
+        }
+
+        .column {
+            flex: 1;
+        }
+
+        .highlight {
+            color: var(--color-accent);
+            font-weight: bold;
+        }
+
+        .badge {
+            display: inline-block;
+            background-color: var(--color-accent);
+            color: var(--color-bg-dark);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+
+        .badge-success {
+            background-color: var(--color-success);
+        }
+
+        .badge-warning {
+            background-color: var(--color-warning);
+        }
+
+        .badge-error {
+            background-color: var(--color-error);
+        }
+
+        .center {
+            text-align: center;
+        }
+
+        .controls {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 100;
+        }
+
+        button {
+            background-color: var(--color-accent);
+            color: var(--color-bg-dark);
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #0284c7;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            background-color: #64748b;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .slide-counter {
+            position: fixed;
+            bottom: 35px;
+            right: 30px;
+            font-size: 1rem;
+            color: var(--color-text-light);
+        }
+
+        .slide-footer {
+            position: absolute;
+            bottom: 15px;
+            right: 30px;
+            font-size: 0.9rem;
+            color: #94a3b8;
+        }
+
+        strong {
+            color: var(--color-accent);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 0.95rem;
+        }
+
+        th, td {
+            border: 1px solid #334155;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #1e293b;
+            color: var(--color-accent);
+        }
+
+        .emoji {
+            font-size: 1.3rem;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Slide 1: Title -->
+    <div class="slide active">
+        <div class="container center">
+            <h1>🟦 ASP.NET Core MVC</h1>
+            <h2 style="font-size: 2rem; margin-top: 30px;">Model Binding & Validation</h2>
+            <p style="margin-top: 40px; font-size: 1.3rem;">Chương 03 & 04: Hướng dẫn chi tiết</p>
+            <p style="margin-top: 20px; color: #94a3b8;">Giảng viên: ASP.NET Core</p>
+        </div>
+        <div class="slide-footer">Slide 1</div>
+    </div>
+
+    <!-- Slide 2: MVC Pattern Overview -->
+    <div class="slide">
+        <h2>MVC Pattern - Khái niệm</h2>
+        <div class="container">
+            <div class="code-block">
+                <pre>Model (Dữ liệu)      ← Entity, Database
+   ↕
+Controller (Logic)   ← Xử lý request, điều phối
+   ↕
+View (Giao diện)     ← HTML, Razor</pre>
+            </div>
+            <p><strong>Workflow:</strong></p>
+            <ul>
+                <li>User request → <code>Routing</code></li>
+                <li>Routing → <code>Controller Action</code></li>
+                <li>Controller xử lý → gọi <code>Model</code></li>
+                <li>Controller trả về <code>View</code></li>
+                <li>View render → Response</li>
+            </ul>
+        </div>
+        <div class="slide-footer">Slide 2</div>
+    </div>
+
+    <!-- Slide 3: Controller Basics -->
+    <div class="slide">
+        <h2>Controller - Tạo Controller đầu tiên</h2>
+        <div class="container">
+            <div class="code-block">
+                <pre>public class HomeController : Controller
+{
+    // Action Method
+    public IActionResult Index()
+    {
+        return View(); // Views/Home/Index.cshtml
+    }
+    
+    public IActionResult About()
+    {
+        return View();
+    }
+}</pre>
+            </div>
+            <p><strong>Quy ước:</strong></p>
+            <ul>
+                <li>Class phải có hậu tố <code>Controller</code></li>
+                <li>Kế thừa từ <code>Controller</code> base class</li>
+                <li>Action = public method trả về <code>IActionResult</code></li>
+            </ul>
+        </div>
+        <div class="slide-footer">Slide 3</div>
+    </div>
+
+    <!-- Slide 4: Action Results -->
+    <div class="slide">
+        <h2>Action Results - Các loại responses</h2>
+        <div class="container">
+            <table>
+                <tr>
+                    <th>Result Type</th>
+                    <th>Mô tả</th>
+                    <th>Ví dụ</th>
+                </tr>
+                <tr>
+                    <td><strong>ViewResult</strong></td>
+                    <td>Trả về HTML View</td>
+                    <td><code>return View();</code></td>
+                </tr>
+                <tr>
+                    <td><strong>JsonResult</strong></td>
+                    <td>Trả về JSON data</td>
+                    <td><code>return Json(data);</code></td>
+                </tr>
+                <tr>
+                    <td><strong>RedirectResult</strong></td>
+                    <td>Chuyển hướng</td>
+                    <td><code>return RedirectToAction("Index");</code></td>
+                </tr>
+                <tr>
+                    <td><strong>NotFoundResult</strong></td>
+                    <td>404 Error</td>
+                    <td><code>return NotFound();</code></td>
+                </tr>
+                <tr>
+                    <td><strong>ContentResult</strong></td>
+                    <td>Trả text/string</td>
+                    <td><code>return Content("Hello");</code></td>
+                </tr>
+            </table>
+        </div>
+        <div class="slide-footer">Slide 4</div>
+    </div>
+
+    <!-- Slide 5: Data Binding -->
+    <div class="slide">
+        <h2>Truyền dữ liệu Controller → View</h2>
+        <div class="container">
+            <div class="code-block">
+                <pre>// Controller
+public IActionResult Details(int id)
+{
+    var product = new Product 
+    { 
+        Id = id, 
+        Name = "Laptop", 
+        Price = 1500 
+    };
+    
+    return View(product);
+}</pre>
+            </div>
+            <div class="code-block">
+                <pre>// View (Strongly Typed - Best Practice)
+@model Product
+
+&lt;h1&gt;@Model.Name&lt;/h1&gt;
+&lt;p&gt;Price: $@Model.Price&lt;/p&gt;</pre>
+            </div>
+        </div>
+        <div class="slide-footer">Slide 5</div>
+    </div>
+
+    <!-- Slide 6: Data Passing Methods -->
+    <div class="slide">
+        <h2>Các cách truyền dữ liệu (1-2)</h2>
+        <div class="container">
+            <p><span class="badge badge-success">✅ Best</span> <strong>Cách 1: Model (Strongly Typed)</strong></p>
+            <div class="code-block">
+                <pre>return View(product); // Strongly typed, safe</pre>
+            </div>
+
+            <p style="margin-top: 20px;"><strong>Cách 2: ViewBag (Dynamic)</strong></p>
+            <div class="code-block">
+                <pre>ViewBag.Title = "Home";
+ViewBag.Count = 10;</pre>
+            </div>
+
+            <p style="margin-top: 15px; color: #fca5a5;">⚠️ Lợi: Linh hoạt | Hại: Không type-safe, khó maintain</p>
+        </div>
+        <div class="slide-footer">Slide 6</div>
+    </div>
+
+    <!-- Slide 7: Data Passing Methods 2 -->
+    <div class="slide">
+        <h2>Các cách truyền dữ liệu (2-2)</h2>
+        <div class="container">
+            <p><strong>Cách 3: ViewData (Dictionary)</strong></p>
+            <div class="code-block">
+                <pre>ViewData["Title"] = "Home";
+ViewData["Count"] = 10;</pre>
+            </div>
+
+            <p style="margin-top: 20px;"><span class="badge badge-success">✅ Khi redirect</span> <strong>Cách 4: TempData</strong></p>
+            <div class="code-block">
+                <pre>TempData["Message"] = "Product created!";
+return RedirectToAction("Index"); // TempData vẫn tồn tại</pre>
+            </div>
+
+            <p style="margin-top: 15px;">📝 <strong>Tóm tắt:</strong> Model (default) → ViewBag/ViewData (dynamic) → TempData (redirect)</p>
+        </div>
+        <div class="slide-footer">Slide 7</div>
+    </div>
+
+    <!-- Slide 8: Routing Basics -->
+    <div class="slide">
+        <h2>Routing - URL Structure</h2>
+        <div class="container">
+            <div class="code-block">
+                <pre>https://example.com/{controller}/{action}/{id?}
+                       ↓          ↓        ↓
+                     Products   Details    5</pre>
+            </div>
+
+            <p><strong>URL Examples:</strong></p>
+            <ul>
+                <li><code>/</code> → <code>HomeController.Index()</code></li>
+                <li><code>/Products</code> → <code>ProductsController.Index()</code></li>
+                <li><code>/Products/Details/5</code> → <code>ProductsController.Details(5)</code></li>
+                <li><code>/Products/Create</code> → <code>ProductsController.Create()</code></li>
+            </ul>
+        </div>
+        <div class="slide-footer">Slide 8</div>
+    </div>
+
+    <!-- Slide 9: Routing Types -->
+    <div class="slide">
+        <h2>Routing Types</h2>
+        <div class="container">
+            <p><strong>1. Conventional Routing (Traditional)</strong></p>
+            <div class="code-block">
+                <pre>// Program.cs
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");</pre>
+            </div>
+
+            <p style="margin-top: 20px;"><span class="badge badge-success">✅ Recommended</span> <strong>2. Attribute Routing (Modern)</strong></p>
+            <div class="code-block">
+                <pre>[Route("products")]
+public class ProductsController
+{
+    [HttpGet("{id}")]
+    public IActionResult Details(int id) { }
+}</pre>
+            </div>
+        </div>
+        <div class="slide-footer">Slide 9</div>
+    </div>
+
+    <!-- Slide 10: Route Constraints -->
+    <div class="slide">
+        <h2>Route Constraints</h2>
+        <div class="container">
+            <p><strong>Giới hạn loại dữ liệu route parameter:</strong></p>
+            <div class="code-block">
+                <pre>// Chỉ chấp nhận số
+[HttpGet("{id:int}")]
+public IActionResult Details(int id) { }
+
+// Chỉ chấp nhận số > 0
+[HttpGet("{id:int:min(1)}")]
+public IActionResult Details(int id) { }
+
+// Chỉ chấp nhận GUID
+[HttpGet("{id:guid}")]
+public IActionResult Details(Guid id) { }
+
+// Regex pattern
+[HttpGet("{slug:regex(^[a-z-]+$)}")]
+public IActionResult Details(string slug) { }</pre>
+            </div>
+        </div>
+        <div class="slide-footer">Slide 10</div>
+    </div>
+
+    <!-- Slide 11: Model Binding Intro -->
+    <div class="slide">
+        <h2>Model Binding - Khái niệm</h2>
+        <div class="container">
+            <p><strong>Model Binding</strong> = Tự động ánh xạ dữ liệu từ HTTP request vào C# objects</p>
+            <p style="margin-top: 20px;"><strong>4 nguồn dữ liệu chính:</strong></p>
+            <ul>
+                <li><code>Form Data</code> - Input field, textarea, select</li>
+                <li><code>Query String</code> - URL: /products?page=2</li>
+                <li><code>Route Parameters</code> - URL: /products/5</li>
+                <li><code>Request Body (JSON)</code> - API POST body</li>
+            </ul>
+            <p style="margin-top: 20px; color: #86efac;"><strong>✓ Benefit:</strong> Không cần parse request thủ công</p>
+        </div>
+        <div class="slide-footer">Slide 11</div>
+    </div>
+
+    <!-- Slide 12: Form Data Binding -->
+    <div class="slide">
+        <h2>Model Binding - Form Data</h2>
+        <div class="container">
+            <p><strong>HTML Form:</strong></p>
+            <div class="code-block">
+                <pre>&lt;form method="post" action="/products/create"&gt;
+    &lt;input type="text" name="Name" /&gt;
+    &lt;input type="number" name="Price" /&gt;
+    &lt;input type="number" name="Stock" /&gt;
+    &lt;button type="submit"&gt;Create&lt;/button&gt;
+&lt;/form&gt;</pre>
+            </div>
+
+            <p style="margin-top: 15px;"><strong>Controller (Auto Binding):</strong></p>
+            <div class="code-block">
+                <pre>[HttpPost("create")]
+public IActionResult Create(Product product)
+{
+    // ASP.NET Core tự động bind:
+    // product.Name = form["Name"]
+    // product.Price = form["Price"]
+}</pre>
+            </div>
+        </div>
+        <div class="slide-footer">Slide 12</div>
+    </div>
+
+    <!-- Slide 13: Query & Route Binding -->
+    <div class="slide">
+        <h2>Model Binding - Query & Route</h2>
+        <div class="container">
+            <p><strong>Query String Binding:</strong></p>
+            <div class="code-block">
+                <pre>// URL: /products?page=2&pageSize=10&sort=price
+[HttpGet]
+public IActionResult Index(int page = 1, int pageSize = 10, string? sort = null)
+{
+    // page = 2, pageSize = 10, sort = "price"
+}</pre>
+            </div>
+
+            <p style="margin-top: 20px;"><strong>Route Parameter Binding:</strong></p>
+            <div class="code-block">
+                <pre>// URL: /products/5
+[HttpGet("{id}")]
+public IActionResult Details(int id) { }
+
+// URL: /products/laptop/electronics
+[HttpGet("{slug}/{category}")]
+public IActionResult Details(string slug, string category) { }</pre>
+            </div>
+        </div>
+        <div class="slide-footer">Slide 13</div>
+    </div>
+
+    <!-- Slide 14: Binding Attributes -->
+    <div class="slide">
+        <h2>Model Binding - Binding Attributes</h2>
+        <div class="container">
+            <p><strong>Chỉ định nguồn dữ liệu rõ ràng:</strong></p>
+            <div class="code-block">
+                <pre>public IActionResult Create(
+    [FromForm] Product product,      // Form data
+    [FromQuery] int page,             // Query string
+    [FromRoute] int id,               // Route parameter
+    [FromBody] CreateRequest request, // JSON body
+    [FromHeader] string authorization // HTTP header
+)
+{
+    // ...
+}</pre>
+            </div>
+
+            <p style="margin-top: 20px; color: #fbbf24;"><strong>💡 Khi nào dùng:</strong> Khi muốn rõ ràng source hoặc có conflict giữa nguồn</p>
+        </div>
+        <div class="slide-footer">Slide 14</div>
+    </div>
+
+    <!-- Slide 15: Validation Intro -->
+    <div class="slide">
+        <h2>Validation - Khái niệm</h2>
+        <div class="container">
+            <p><strong>Validation</strong> = Kiểm tra dữ liệu nhập vào hợp lệ trước khi xử lý</p>
+
+            <p style="margin-top: 25px;"><strong>Tại sao cần Validation:</strong></p>
+            <ul>
+                <li>✓ Bảo vệ dữ liệu database</li>
+                <li>✓ Cải thiện user experience</li>
+                <li>✓ Ngăn chặn lỗi runtime</li>
+                <li>✓ Bảo mật (SQL injection, XSS, v.v.)</li>
+            </ul>
+
+            <p style="margin-top: 20px;"><strong>2 loại Validation:</strong></p>
+            <ul>
+                <li><code>Server-side</code> (bắt buộc, an toàn)</li>
+                <li><code>Client-side</code> (UX tốt hơn, không bắt buộc)</li>
+            </ul>
+        </div>
+        <div class="slide-footer">Slide 15</div>
+    </div>
+
+    <!-- Slide 16: Required Validation -->
+    <div class="slide">
+        <h2>Data Annotations - Required</h2>
+        <div class="container">
+            <p><strong>Bắt buộc nhập dữ liệu:</strong></p>
+            <div class="code-block">
+                <pre">public class Product
+{
+    public int Id { get; set; }
+    
+    [Required(ErrorMessage = "Product name is required")]
+    public string Name { get; set; } = string.Empty;
+    
+    [Required]
+    public decimal Price { get; set; }
+}</pre>
+            </div>
+
+            <p style="margin-top: 20px;"><strong>Controller Validation:</strong></p>
+            <div class="code-block">
+                <pre">if (!ModelState.IsValid)
+{
+    return View(product); // Trả về view với errors
+}
+// Xử lý logic</pre>
+            </div>
+        </div>
+        <div class="slide-footer">Slide 16</div>
+    </div>
+
+    <!-- Slide 17: StringLength & Range -->
+    <div class="slide">
+        <h2>Data Annotations - StringLength & Range</h2>
+        <div class="container">
+            <p><strong>StringLength - Kiểm tra độ dài chuỗi:</strong></p>
+            <div class="code-block">
+                <pre>public class Product
+{
+    [Required]
+    [StringLength(200, MinimumLength = 3, 
+        ErrorMessage = "Name must be 3-200 characters")]
+    public string Name { get; set; } = string.Empty;
+}</pre>
+            </div>
+
+            <p style="margin-top: 20px;"><strong>Range - Kiểm tra giới hạn số:</strong></p>
+            <div class="code-block">
+                <pre>public class Product
+{
+    [Range(0.01, 1000000, 
+        ErrorMessage = "Price must be 0.01 - 1,000,000")]
+    public decimal Price { get; set; }
+    
+    [Range(0, int.MaxValue, ErrorMessage = "Stock ≥ 0")]
+    public int Stock { get; set; }
+}</pre>
+            </div>
+        </div>
+        <div class="slide-footer">Slide 17</div>
+    </div>
+
+    <!-- Slide 18: Email & Regex -->
+    <div class="slide">
+        <h2>Data Annotations - Email & RegularExpression</h2>
+        <div class="container">
+            <p><strong>EmailAddress - Validate email format:</strong></p>
+            <div class="code-block">
+                <pre">public class User
+{
+    [Required]
+    [EmailAddress(ErrorMessage = "Invalid email format")]
+    public string Email { get; set; } = string.Empty;
+}</pre>
+            </div>
+
+            <p style="margin-top: 20px;"><strong>RegularExpression - Pattern matching:</strong></p>
+            <div class="code-block">
+                <pre">public class User
+{
+    [RegularExpression(@"^[0-9]{10}$", 
+        ErrorMessage = "Phone must be 10 digits")]
+    public string Phone { get; set; } = string.Empty;
+    
+    [RegularExpression(@"^[a-zA-Z0-9_-]+$", 
+        ErrorMessage = "Username: letters, numbers, _, -")]
+    public string Username { get; set; } = string.Empty;
+}</pre>
+            </div>
+        </div>
+        <div class="slide-footer">Slide 18</div>
+    </div>
+
+    <!-- Slide 19: Compare & Other Annotations -->
+    <div class="slide">
+        <h2>Data Annotations - Compare & Url</h2>
+        <div class="container">
+            <p><strong>Compare - So sánh 2 fields:</strong></p>
+            <div class="code-block">
+                <pre">public class RegisterRequest
+{
+    [Required]
+    [DataType(DataType.Password)]
+    public string Password { get; set; } = string.Empty;
+    
+    [Required]
+    [Compare("Password", ErrorMessage = "Passwords not match")]
+    [DataType(DataType.Password)]
+    public string ConfirmPassword { get; set; } = string.Empty;
+}</pre>
+            </div>
+
+            <p style="margin-top: 20px;"><strong>Url & CreditCard:</strong></p>
+            <div class="code-block">
+                <pre">[Url(ErrorMessage = "Invalid URL format")]
+public string? ImageUrl { get; set; }
+
+[CreditCard(ErrorMessage = "Invalid card number")]
+public string CardNumber { get; set; }</pre>
+            </div>
+        </div>
+        <div class="slide-footer">Slide 19</div>
+    </div>
+
+    <!-- Slide 20: Custom Validators -->
+    <div class="slide">
+        <h2>Custom Validation - ValidationAttribute</h2>
+        <div class="container">
+            <p><strong>Tạo custom validator cho logic phức tạp:</strong></p>
+            <div class="code-block">
+                <pre">public class PriceRoundingAttribute : ValidationAttribute
+{
+    protected override ValidationResult? IsValid(
+        object? value, ValidationContext validationContext)
+    {
+        if (value is decimal price)
+        {
+            if (price % 1000 != 0)
+                return new ValidationResult(
+                    "Price must be rounded to thousands");
+        }
+        return ValidationResult.Success;
+    }
+}
+
+// Sử dụng
+public class Product
+{
+    [Required]
+    [PriceRounding]
+    public decimal Price { get; set; }
+}</pre>
+            </div>
+        </div>
+        <div class="slide-footer">Slide 20</div>
+    </div>
+
+    <!-- Slide 21: IValidatableObject -->
+    <div class="slide">
+        <h2>Custom Validation - IValidatableObject</h2>
+        <div class="container">
+            <p><strong>Validation phức tạp liên quan nhiều properties:</strong></p>
+            <div class="code-block">
+                <pre">public class Product : IValidatableObject
+{
+    public string Name { get; set; } = string.Empty;
+    public decimal Price { get; set; }
+    public decimal DiscountPrice { get; set; }
+    
+    public IEnumerable<ValidationResult> Validate(
+        ValidationContext validationContext)
+    {
+        if (DiscountPrice >= Price)
+            yield return new ValidationResult(
+                "Discount must be < regular price",
+                new[] { nameof(DiscountPrice) });
+        
+        var discount = (Price - DiscountPrice) / Price * 100;
+        if (discount > 0 && discount < 10)
+            yield return new ValidationResult(
+                "Discount must be ≥ 10%");
+    }
+}</pre>
+            </div>
+        </div>
+        <div class="slide-footer">Slide 21</div>
+    </div>
+
+    <!-- Slide 22: ModelState.IsValid -->
+    <div class="slide">
+        <h2>Validation trong Controller - ModelState</h2>
+        <div class="container">
+            <p><strong>Kiểm tra validation với ModelState.IsValid:</strong></p>
+            <div class="code-block">
+                <pre">[ HttpPost("create")]
+public async Task<IActionResult> Create(Product product)
+{
+    // Kiểm tra validation
+    if (!ModelState.IsValid)
+    {
+        // Trả về view với errors
+        return View(product);
+    }
+    
+    // Validation pass → Xử lý logic
+    await _db.Products.AddAsync(product);
+    await _db.SaveChangesAsync();
+    
+    TempData["SuccessMessage"] = "Product created!";
+    return RedirectToAction("Index");
+}</pre>
+            </div>
+        </div>
+        <div class="slide-footer">Slide 22</div>
+    </div>
+
+    <!-- Slide 23: Manual Validation -->
+    <div class="slide">
+        <h2>Validation trong Controller - Manual</h2>
+        <div class="container">
+            <p><strong>Thêm validation errors thủ công:</strong></p>
+            <div class="code-block">
+                <pre">[ HttpPost("create")]
+public async Task<IActionResult> Create(Product product)
+{
+    // Custom validation logic
+    if (await _db.Products.AnyAsync(p => p.Name == product.Name))
+        ModelState.AddModelError("Name", "Name already exists");
+    
+    if (product.Price < 1000)
+        ModelState.AddModelError("Price", "Min price: 1000");
+    
+    if (!ModelState.IsValid)
+        return View(product);
+    
+    // Save to database
+    await _db.Products.AddAsync(product);
+    await _db.SaveChangesAsync();
+    
+    return RedirectToAction("Index");
+}</pre>
+            </div>
+        </div>
+        <div class="slide-footer">Slide 23</div>
+    </div>
+
+    <!-- Slide 24: View Model & DTO -->
+    <div class="slide">
+        <h2>ViewModel & DTO Pattern</h2>
+        <div class="container">
+            <p><span class="badge badge-error">❌ BAD</span> Expose Entity trực tiếp:</p>
+            <div class="code-block">
+                <pre">[HttpPost]
+public IActionResult Create(Product product)
+{
+    // Nguy hiểm: product.Id = 999 (hack!)
+}</pre>
+            </div>
+
+            <p style="margin-top: 20px;"><span class="badge badge-success">✅ GOOD</span> Dùng DTO/ViewModel:</p>
+            <div class="code-block">
+                <pre>public record CreateProductRequest(
+    string Name,
+    string Description,
+    decimal Price,
+    int Stock,
+    int CategoryId
+);
+
+[HttpPost("create")]
+public async Task<IActionResult> Create(CreateProductRequest request)
+{
+    // Safe: chỉ nhận fields định nghĩa
+    var product = new Product { ... };
+}</pre>
+            </div>
+        </div>
+        <div class="slide-footer">Slide 24</div>
+    </div>
+
+    <!-- Slide 25: ViewModel Example -->
+    <div class="slide">
+        <h2>ViewModel cho View phức tạp</h2>
+        <div class="container">
+            <p><strong>ViewModel = Combine nhiều data cho View:</strong></p>
+            <div class="code-block">
+                <pre">public class ProductCreateViewModel
+{
+    [Required]
+    [StringLength(200)]
+    public string Name { get; set; } = string.Empty;
+    
+    [Required]
+    [Range(0.01, 1000000)]
+    public decimal Price { get; set; }
+    
+    [Required]
+    public int CategoryId { get; set; }
+    
+    // Danh sách categories cho dropdown
+    public List<Category> Categories { get; set; } = new();
+}
+
+// Controller
+[HttpGet("create")]
+public async Task<IActionResult> Create()
+{
+    var viewModel = new ProductCreateViewModel
+    {
+        Categories = await _db.Categories.ToListAsync()
+    };
+    return View(viewModel);
+}</pre>
+            </div>
+        </div>
+        <div class="slide-footer">Slide 25</div>
+    </div>
+
+    <!-- Slide 26: Client-side Validation -->
+    <div class="slide">
+        <h2>Validation trong View (Razor)</h2>
+        <div class="container">
+            <p><strong>Hiển thị validation errors:</strong></p>
+            <div class="code-block">
+                <pre">@model ProductCreateViewModel
+
+&lt;form method="post"&gt;
+    &lt;!-- Validation Summary --&gt;
+    &lt;div asp-validation-summary="All" class="text-danger"&gt;&lt;/div&gt;
+    
+    &lt;div&gt;
+        &lt;label asp-for="Name"&gt;&lt;/label&gt;
+        &lt;input asp-for="Name" /&gt;
+        &lt;span asp-validation-for="Name" class="text-danger"&gt;&lt;/span&gt;
+    &lt;/div&gt;
+    
+    &lt;div&gt;
+        &lt;label asp-for="Price"&gt;&lt;/label&gt;
+        &lt;input asp-for="Price" /&gt;
+        &lt;span asp-validation-for="Price" class="text-danger"&gt;&lt;/span&gt;
+    &lt;/div&gt;
+    
+    &lt;button type="submit"&gt;Create&lt;/button&gt;
+&lt;/form&gt;
+
+@section Scripts {
+    &lt;partial name="_ValidationScriptsPartial" /&gt;
+}</pre>
+            </div>
+        </div>
+        <div class="slide-footer">Slide 26</div>
+    </div>
+
+    <!-- Slide 27: API Validation Response -->
+    <div class="slide">
+        <h2>Validation Error Response (API)</h2>
+        <div class="container">
+            <p><strong>Controller:</strong></p>
+            <div class="code-block">
+                <pre">[ ApiController]
+[Route("api/[controller]")]
+public class ProductsController : ControllerBase
+{
+    [HttpPost]
+    public async Task<ActionResult<Product>> Create(CreateProductRequest request)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+        
+        // Save...
+        return CreatedAtAction(nameof(GetById), product);
+    }
+}</pre>
+            </div>
+
+            <p style="margin-top: 15px;"><strong>Response (400 Bad Request):</strong></p>
+            <div class="code-block">
+                <pre">{
+  "title": "One or more validation errors occurred",
+  "status": 400,
+  "errors": {
+    "Name": ["Product name is required"],
+    "Price": ["Price must be 0.01 - 1,000,000"]
+  }
+}</pre>
+            </div>
+        </div>
+        <div class="slide-footer">Slide 27</div>
+    </div>
+
+    <!-- Slide 28: CRUD Example -->
+    <div class="slide">
+        <h2>CRUD Example - Products Controller (1/2)</h2>
+        <div class="container">
+            <div class="code-block">
+                <pre">[ Route("products")]
+public class ProductsController : Controller
+{
+    [HttpGet]
+    public IActionResult Index()
+    {
+        return View(_products);
+    }
+    
+    [HttpGet("{id}")]
+    public IActionResult Details(int id)
+    {
+        var product = _products.FirstOrDefault(p => p.Id == id);
+        if (product == null) return NotFound();
+        return View(product);
+    }
+    
+    [HttpGet("create")]
+    public IActionResult Create() => View();
+    
+    [HttpPost("create")]
+    public IActionResult Create(Product product)
+    {
+        if (!ModelState.IsValid) return View(product);
+        
+        product.Id = _products.Max(p => p.Id) + 1;
+        _products.Add(product);
+        TempData["SuccessMessage"] = "Created!";
+        return RedirectToAction("Index");
+    }</pre>
+            </div>
+        </div>
+        <div class="slide-footer">Slide 28</div>
+    </div>
+
+    <!-- Slide 29: CRUD Example 2 -->
+    <div class="slide">
+        <h2>CRUD Example - Products Controller (2/2)</h2>
+        <div class="container">
+            <div class="code-block">
+                <pre">    [HttpGet("{id}/edit")]
+    public IActionResult Edit(int id)
+    {
+        var product = _products.FirstOrDefault(p => p.Id == id);
+        if (product == null) return NotFound();
+        return View(product);
+    }
+    
+    [HttpPost("{id}/edit")]
+    public IActionResult Edit(int id, Product updated)
+    {
+        var product = _products.FirstOrDefault(p => p.Id == id);
+        if (product == null) return NotFound();
+        
+        product.Name = updated.Name;
+        product.Price = updated.Price;
+        product.Stock = updated.Stock;
+        
+        TempData["SuccessMessage"] = "Updated!";
+        return RedirectToAction("Index");
+    }
+    
+    [HttpPost("{id}/delete")]
+    public IActionResult Delete(int id)
+    {
+        var product = _products.FirstOrDefault(p => p.Id == id);
+        if (product == null) return NotFound();
+        
+        _products.Remove(product);
+        TempData["SuccessMessage"] = "Deleted!";
+        return RedirectToAction("Index");
+    }
+}</pre>
+            </div>
+        </div>
+        <div class="slide-footer">Slide 29</div>
+    </div>
+
+    <!-- Slide 30: Best Practices -->
+    <div class="slide">
+        <h2>Best Practices Summary</h2>
+        <div class="container">
+            <p><strong>1. Routing:</strong></p>
+            <ul>
+                <li>✅ Dùng <code>Attribute Routing</code> (rõ ràng, dễ maintain)</li>
+                <li>❌ Tránh Conventional Routing trong dự án lớn</li>
+            </ul>
+
+            <p style="margin-top: 15px;"><strong>2. Data Passing:</strong></p>
+            <ul>
+                <li>✅ Dùng <code>Model</code> (strongly typed)</li>
+                <li>❌ Tránh <code>ViewBag</code> (không type-safe)</li>
+            </ul>
+
+            <p style="margin-top: 15px;"><strong>3. Validation:</strong></p>
+            <ul>
+                <li>✅ Luôn kiểm tra <code>ModelState.IsValid</code></li>
+                <li>✅ Dùng <code>DTO/ViewModel</code> thay Entity</li>
+                <li>❌ Không bỏ qua server-side validation</li>
+            </ul>
+        </div>
+        <div class="slide-footer">Slide 30</div>
+    </div>
+
+    <!-- Slide 31: Summary -->
+    <div class="slide center">
+        <h2>📌 Tóm tắt Chương</h2>
+        <div class="container">
+            <ul style="text-align: left; margin-top: 30px;">
+                <li><strong>MVC Pattern:</strong> Model (dữ liệu) - View (UI) - Controller (logic)</li>
+                <li><strong>Routing:</strong> Dùng Attribute Routing, hỗ trợ constraints</li>
+                <li><strong>Action Results:</strong> View, Json, Redirect, NotFound, Content</li>
+                <li><strong>Data Passing:</strong> Model > ViewBag > ViewData > TempData</li>
+                <li><strong>Model Binding:</strong> Tự động map Form/Query/Route/Body</li>
+                <li><strong>Validation:</strong> Data Annotations, Custom Validators, IValidatableObject</li>
+                <li><strong>Security:</strong> Luôn dùng DTO/ViewModel, không expose Entity</li>
+                <li><strong>Always:</strong> Kiểm tra ModelState.IsValid trước xử lý</li>
+            </ul>
+        </div>
+        <div class="slide-footer">Slide 31</div>
+    </div>
+
+    <!-- Slide 32: Thank You -->
+    <div class="slide center">
+        <h1 style="font-size: 3rem; margin-bottom: 40px;">Cảm ơn!</h1>
+        <p style="font-size: 1.3rem; margin-bottom: 30px;">Bài học: ASP.NET Core MVC & Validation</p>
+        <p style="color: #94a3b8; margin-bottom: 15px;">Tiếp theo: Chapter 05 - Entity Framework Core</p>
+        <div style="margin-top: 40px;">
+            <p style="color: #38bdf8; font-size: 1.1rem;">📧 Questions? Contact your instructor</p>
+        </div>
+        <div class="slide-footer">Slide 32</div>
+    </div>
+
+    <!-- Navigation Controls -->
+    <div class="controls">
+        <button id="prevBtn" onclick="changeSlide(-1)">← Previous</button>
+        <button id="nextBtn" onclick="changeSlide(1)">Next →</button>
+    </div>
+
+    <div class="slide-counter">
+        <span id="currentSlide">1</span> / <span id="totalSlides">32</span>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        function showSlide(n) {
+            slides.forEach(slide => slide.classList.remove('active'));
+            
+            if (n >= totalSlides) {
+                currentSlide = totalSlides - 1;
+            } else if (n < 0) {
+                currentSlide = 0;
+            } else {
+                currentSlide = n;
+            }
+            
+            slides[currentSlide].classList.add('active');
+            
+            document.getElementById('currentSlide').textContent = currentSlide + 1;
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+        }
+
+        function changeSlide(n) {
+            showSlide(currentSlide + n);
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') changeSlide(-1);
+            if (e.key === 'ArrowRight') changeSlide(1);
+        });
+
+        // Initialize
+        showSlide(0);
+    </script>
+</body>
+</html>
