@@ -16,9 +16,18 @@ public class CategoriesController : ControllerBase
 
     // 1. GET /api/categories
     [HttpGet]
-    public ActionResult<List<Category>> GetAll()
+    // GET /api/categories?name=electronics
+
+    public ActionResult<List<Category>> GetAllCategories(string? name = null)
     {
-        return Ok(_categoryService.GetAllCategories());
+        var categories = _categoryService.GetAllCategories();
+        if (!string.IsNullOrEmpty(name))
+        {
+            // TODO: Hãy viết LINQ để filter theo name (case-insensitive)
+            categories = categories.Where(c => c.Name.Contains(name, StringComparison.OrdinalIgnoreCase))
+                                   .ToList();
+        }
+        return Ok(categories);
     }
 
     // 2. GET /api/categories/{id}
@@ -55,5 +64,18 @@ public class CategoriesController : ControllerBase
         var result = _categoryService.DeleteCategory(id);
         if (!result) return NotFound();
         return NoContent(); // 204
+    }
+
+    [HttpGet("paging")] // Đặt route khác hoặc sửa route cũ
+    public ActionResult<List<Category>> GetAllCategoriesPaging(int page = 1, int pageSize = 10)
+    {
+        var categories = _categoryService.GetAllCategories();
+
+        // Công thức Pagination
+        var paginated = categories.Skip((page - 1) * pageSize)
+                                .Take(pageSize)
+                                .ToList();
+
+        return Ok(paginated);
     }
 }
