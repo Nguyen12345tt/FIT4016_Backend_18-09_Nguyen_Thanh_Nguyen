@@ -1,81 +1,82 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using EFCore.Models; // Nhớ đổi tên namespace cho đúng
-using EFCore.Services; // Nhớ đổi tên namespace cho đúng
+using EFCore.Models; // Thay bằng namespace chứa Product của bạn
+using EFCore.Services; // Thay bằng namespace chứa ProductService của bạn
 
-namespace EFCore.Controllers;
-
-[Route("api/[controller]")]
-[ApiController]
-public class ProductsController : ControllerBase
+namespace EFCore.Controllers
 {
-    private readonly ProductService _productService;
-
-    // Inject ProductService vào Controller
-    public ProductsController(ProductService productService)
+    [Route("api/[controller]")]
+    [ApiController]
+    public class ProductsController : ControllerBase
     {
-        _productService = productService;
-    }
+        private readonly ProductService _productService;
 
-    // GET: api/products
-    [HttpGet]
-    public async Task<ActionResult<List<Product>>> GetAll()
-    {
-        var products = await _productService.GetAllAsync();
-        return Ok(products);
-    }
-
-    // GET: api/products/5
-    [HttpGet("{id}")]
-    public async Task<ActionResult<Product>> GetById(int id)
-    {
-        var product = await _productService.GetByIdAsync(id);
-        if (product == null) return NotFound();
-        return Ok(product);
-    }
-
-    // POST: api/products
-    [HttpPost]
-    public async Task<ActionResult<Product>> Create(Product product)
-    {
-        var createdProduct = await _productService.CreateAsync(product);
-        return CreatedAtAction(nameof(GetById), new { id = createdProduct.Id }, createdProduct);
-    }
-
-    // PUT: api/products/5
-    [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, Product product)
-    {
-        try
+        // Inject ProductService vào Controller
+        public ProductsController(ProductService productService)
         {
-            var updated = await _productService.UpdateAsync(id, product);
-            return Ok(updated);
+            _productService = productService;
         }
-        catch (Exception) // Bắt lỗi nếu không tìm thấy ID
-        {
-            return NotFound();
-        }
-    }
 
-    // DELETE: api/products/5
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
-    {
-        try
+        // 1. GET: api/products (Lấy danh sách)
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
         {
-            await _productService.DeleteAsync(id);
-            return NoContent(); // 204 No Content
+            var products = await _productService.GetAllAsync(); // [cite: 195]
+            return Ok(products);
         }
-        catch (Exception)
-        {
-            return NotFound();
-        }
-    }
 
-    // API Search (Bài nâng cao)
-    [HttpGet("search")]
-    public async Task<ActionResult<List<Product>>> Search(string? term, int? catId)
-    {
-        var results = await _productService.SearchAsync(term, catId);
-        return Ok(results);
+        // 2. GET: api/products/{id} (Lấy chi tiết)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var product = await _productService.GetByIdAsync(id); // [cite: 203]
+            if (product == null) return NotFound();
+            return Ok(product);
+        }
+
+        // 3. POST: api/products (Thêm mới)
+        [HttpPost]
+        public async Task<IActionResult> Create(Product product)
+        {
+            var createdProduct = await _productService.CreateAsync(product); // [cite: 187]
+            return CreatedAtAction(nameof(GetById), new { id = createdProduct.Id }, createdProduct);
+        }
+
+        // 4. PUT: api/products/{id} (Cập nhật)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, Product product)
+        {
+            try
+            {
+                var updatedProduct = await _productService.UpdateAsync(id, product); // [cite: 210]
+                return Ok(updatedProduct);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
+        // 5. DELETE: api/products/{id} (Xóa)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            try
+            {
+                await _productService.DeleteAsync(id); // [cite: 222]
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
+        // 6. GET: api/products/search?term=abc (Tìm kiếm - Optional)
+        [HttpGet("search")]
+        public async Task<IActionResult> Search([FromQuery] string? term, [FromQuery] int? categoryId)
+        {
+            var result = await _productService.SearchAsync(term, categoryId); // [cite: 233]
+            return Ok(result);
+        }
     }
 }
