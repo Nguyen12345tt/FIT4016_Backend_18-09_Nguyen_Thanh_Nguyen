@@ -1,0 +1,1313 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entity Framework Core</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            color: #1a1a1a;
+            overflow: hidden;
+        }
+
+        .slide-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #ffffff;
+            padding: 0;
+            position: relative;
+        }
+
+        .slide {
+            display: none;
+            width: 100%;
+            height: 100vh;
+            padding: 60px;
+            background-color: #ffffff;
+            color: #1a1a1a;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
+        .slide h1 {
+            font-size: 3.5rem;
+            margin-bottom: 30px;
+            color: #0066cc;
+            font-weight: 700;
+            border-bottom: 3px solid #0066cc;
+            padding-bottom: 20px;
+        }
+
+        .slide h2 {
+            font-size: 2.5rem;
+            margin-top: 30px;
+            margin-bottom: 20px;
+            color: #0066cc;
+            font-weight: 600;
+        }
+
+        .slide h3 {
+            font-size: 1.8rem;
+            margin-top: 20px;
+            margin-bottom: 15px;
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        .slide h4 {
+            font-size: 1.4rem;
+            margin-top: 15px;
+            margin-bottom: 10px;
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        .slide h5, .slide h6 {
+            font-size: 1.1rem;
+            margin-top: 10px;
+            margin-bottom: 8px;
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        .slide p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 15px;
+            color: #333333;
+        }
+
+        .slide ul, .slide ol {
+            margin-left: 40px;
+            margin-bottom: 20px;
+            color: #333333;
+        }
+
+        .slide li {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 10px;
+            color: #333333;
+        }
+
+        .slide code {
+            background-color: #f0f0f0;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #d32f2f;
+            font-size: 0.95rem;
+        }
+
+        .slide pre {
+            background-color: #f0f0f0;
+            padding: 20px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin-bottom: 20px;
+            border-left: 4px solid #0066cc;
+            font-size: 0.95rem;
+        }
+
+        .slide pre code {
+            background-color: transparent;
+            padding: 0;
+            color: #1a1a1a;
+            font-size: 0.95rem;
+        }
+
+        .slide em {
+            color: #d32f2f;
+            font-style: italic;
+        }
+
+        .slide strong {
+            color: #0066cc;
+            font-weight: 700;
+        }
+
+        .slide hr {
+            border: none;
+            border-top: 2px solid #cccccc;
+            margin: 30px 0;
+        }
+
+        .slide table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            font-size: 1rem;
+        }
+
+        .slide table th {
+            background-color: #e8f0ff;
+            color: #0066cc;
+            padding: 12px;
+            text-align: left;
+            border-bottom: 2px solid #0066cc;
+            font-weight: 600;
+        }
+
+        .slide table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #dddddd;
+            color: #333333;
+        }
+
+        .slide table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .slide-number {
+            position: fixed;
+            bottom: 20px;
+            right: 30px;
+            font-size: 1rem;
+            color: #666666;
+            background-color: #f0f0f0;
+            padding: 8px 15px;
+            border-radius: 20px;
+        }
+
+        .controls {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 100;
+        }
+
+        button {
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 102, 204, 0.3);
+        }
+
+        button:hover {
+            background-color: #0052a3;
+            box-shadow: 0 4px 12px rgba(0, 102, 204, 0.4);
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .slide-counter {
+            position: fixed;
+            bottom: 25px;
+            left: 30px;
+            font-size: 1rem;
+            color: #666666;
+            background-color: #f0f0f0;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        /* Scroll styling */
+        .slide::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .slide::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .slide::-webkit-scrollbar-thumb {
+            background: #0066cc;
+            border-radius: 4px;
+        }
+
+        .slide::-webkit-scrollbar-thumb:hover {
+            background: #0052a3;
+        }
+
+        /* Highlight for special elements */
+        .slide blockquote {
+            border-left: 4px solid #0066cc;
+            padding-left: 20px;
+            margin-left: 0;
+            margin-bottom: 20px;
+            color: #555555;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <!-- Slide 1 -->
+    <div class="slide active">
+        <h1>🟩 CHƯƠNG 05 & 06</h1>
+        <h2>ENTITY FRAMEWORK CORE</h2>
+        <h3>Phần 1: CODE FIRST & MIGRATIONS</h3>
+        <h3>Phần 2: CRUD & RELATIONSHIPS</h3>
+        <p style="margin-top: 40px; font-size: 1.3rem; color: #0066cc;">
+            Entity Framework Core (EF Core) là ORM (Object-Relational Mapper) giúp bạn làm việc với Database bằng C# objects thay vì viết SQL thuần.
+        </p>
+    </div>
+
+    <!-- Slide 2 -->
+    <div class="slide">
+        <h2>🎯 MỤC TIÊU HỌC TẬP (Phần 1)</h2>
+        <ul>
+            <li>Hiểu ORM là gì và tại sao cần EF Core</li>
+            <li>Thiết kế Database bằng C# classes (Code First)</li>
+            <li>Cấu hình DbContext và Connection String</li>
+            <li>Sử dụng Migrations để tạo/cập nhật Database</li>
+            <li>Hiểu Data Annotations và Fluent API</li>
+            <li>Tạo Database cho dự án E-Shop</li>
+        </ul>
+    </div>
+
+    <!-- Slide 3 -->
+    <div class="slide">
+        <h2>🎯 MỤC TIÊU HỌC TẬP (Phần 2)</h2>
+        <ul>
+            <li>Thành thạo CRUD operations với EF Core</li>
+            <li>Hiểu Eager Loading, Lazy Loading, Explicit Loading</li>
+            <li>Cấu hình quan hệ: 1-1, 1-N, N-N</li>
+            <li>Xử lý cascade delete</li>
+            <li>Tối ưu query performance</li>
+            <li>Xây dựng chức năng CRUD hoàn chỉnh cho E-Shop</li>
+        </ul>
+    </div>
+
+    <!-- Slide 4 -->
+    <div class="slide">
+        <h2>1. ORM VÀ ENTITY FRAMEWORK CORE</h2>
+        <h3>ORM là gì?</h3>
+        <p><strong>Object-Relational Mapping</strong> — Ánh xạ giữa Object (C#) và Relational Database (SQL).</p>
+        <h4>🏠 Ví dụ đời sống</h4>
+        <p>ORM giống như <strong>phiên dịch viên</strong>:</p>
+        <ul>
+            <li>Bạn nói tiếng Việt (C# objects)</li>
+            <li>Database hiểu tiếng Anh (SQL)</li>
+            <li>ORM dịch giữa 2 ngôn ngữ</li>
+        </ul>
+    </div>
+
+    <!-- Slide 5 -->
+    <div class="slide">
+        <h2>Ví dụ: Với EF Core</h2>
+        <p>Bạn viết C#:</p>
+        <pre><code>var products = await _db.Products.Where(p => p.Price > 1000).ToListAsync();</code></pre>
+        <p>EF Core tự động tạo SQL:</p>
+        <pre><code>SELECT * FROM Products WHERE Price > 1000</code></pre>
+    </div>
+
+    <!-- Slide 6 -->
+    <div class="slide">
+        <h2>Tại sao dùng EF Core?</h2>
+        <h3>❌ Không dùng ORM (ADO.NET thuần) — Vấn đề:</h3>
+        <ul>
+            <li>Nhiều boilerplate code</li>
+            <li>Dễ lỗi (typo, SQL injection)</li>
+            <li>Khó maintain</li>
+        </ul>
+        <h3>✅ Dùng EF Core — Lợi ích:</h3>
+        <ul>
+            <li>Ngắn gọn, dễ đọc</li>
+            <li>Type-safe (compile-time checking)</li>
+            <li>An toàn (tự động prevent SQL injection)</li>
+            <li>Dễ maintain</li>
+        </ul>
+    </div>
+
+    <!-- Slide 7 -->
+    <div class="slide">
+        <h2>2. CODE FIRST WORKFLOW</h2>
+        <h3>Code First là gì?</h3>
+        <p><strong>Code First</strong> = Viết C# code trước → Database được tạo tự động từ code.</p>
+        <h4>Workflow:</h4>
+        <ol>
+            <li>Viết Entity Classes (Product, Category)</li>
+            <li>Tạo DbContext</li>
+            <li>Add Migration</li>
+            <li>Update Database</li>
+            <li>Database được tạo tự động!</li>
+        </ol>
+    </div>
+
+    <!-- Slide 8 -->
+    <div class="slide">
+        <h2>3. ENTITY CLASS CƠ BẢN</h2>
+        <pre><code>// Models/Product.cs
+public class Product
+{
+    public int Id { get; set; }  // Primary Key (tự động)
+    public string Name { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public decimal Price { get; set; }
+    public int Stock { get; set; }
+    public DateTime CreatedAt { get; set; }
+    
+    // Foreign Key
+    public int CategoryId { get; set; }
+    
+    // Navigation Property
+    public Category Category { get; set; } = null!;
+}</code></pre>
+    </div>
+
+    <!-- Slide 9 -->
+    <div class="slide">
+        <h2>Data Annotations</h2>
+        <h3>[Key] — Primary Key</h3>
+        <pre><code>public class Product
+{
+    [Key]
+    public int ProductId { get; set; } // Không phải "Id" → cần [Key]
+}</code></pre>
+        <p><strong>Lưu ý:</strong> Nếu property tên là <code>Id</code> hoặc <code>{ClassName}Id</code> → tự động là Primary Key.</p>
+    </div>
+
+    <!-- Slide 10 -->
+    <div class="slide">
+        <h2>Data Annotations (Tiếp)</h2>
+        <h3>[Required] — Không cho phép NULL</h3>
+        <pre><code>[Required]
+[MaxLength(200)]
+public string Name { get; set; } = string.Empty;</code></pre>
+        <h3>[MaxLength] / [StringLength] — Độ dài string</h3>
+        <pre><code>[MaxLength(200)]
+public string Name { get; set; } = string.Empty;
+
+[StringLength(1000, MinimumLength = 10)]
+public string Description { get; set; } = string.Empty;</code></pre>
+    </div>
+
+    <!-- Slide 11 -->
+    <div class="slide">
+        <h2>E-Shop Models (Hoàn chỉnh)</h2>
+        <pre><code>// Models/Category.cs
+public class Category
+{
+    public int Id { get; set; }
+    
+    [Required]
+    [MaxLength(100)]
+    public string Name { get; set; } = string.Empty;
+    
+    [MaxLength(500)]
+    public string Description { get; set; } = string.Empty;
+    
+    public DateTime CreatedAt { get; set; }
+    
+    // Navigation Property
+    public ICollection&lt;Product&gt; Products { get; set; } = new List&lt;Product&gt;();
+}</code></pre>
+    </div>
+
+    <!-- Slide 12 -->
+    <div class="slide">
+        <h2>E-Shop Models - Product</h2>
+        <pre><code>public class Product
+{
+    public int Id { get; set; }
+    
+    [Required]
+    [MaxLength(200)]
+    public string Name { get; set; } = string.Empty;
+    
+    [MaxLength(2000)]
+    public string Description { get; set; } = string.Empty;
+    
+    [Column(TypeName = "decimal(18,2)")]
+    public decimal Price { get; set; }
+    
+    public int Stock { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime? UpdatedAt { get; set; }
+    
+    // Foreign Key & Navigation
+    public int CategoryId { get; set; }
+    public Category Category { get; set; } = null!;
+}</code></pre>
+    </div>
+
+    <!-- Slide 13 -->
+    <div class="slide">
+        <h2>4. DBCONTEXT — CỔNG KẾT NỐI</h2>
+        <h3>DbContext là gì?</h3>
+        <p><strong>DbContext</strong> là class chính để tương tác với Database.</p>
+        <h4>🏠 Ví dụ đời sống</h4>
+        <p>DbContext giống như <strong>quầy giao dịch ngân hàng</strong>:</p>
+        <ul>
+            <li>Bạn muốn rút tiền (query data) → Qua quầy</li>
+            <li>Bạn muốn gửi tiền (insert data) → Qua quầy</li>
+            <li>Bạn muốn chuyển khoản (update data) → Qua quầy</li>
+        </ul>
+    </div>
+
+    <!-- Slide 14 -->
+    <div class="slide">
+        <h2>Tạo DbContext</h2>
+        <pre><code>// Data/AppDbContext.cs
+using Microsoft.EntityFrameworkCore;
+
+public class AppDbContext : DbContext
+{
+    public AppDbContext(DbContextOptions&lt;AppDbContext&gt; options) 
+        : base(options) { }
+    
+    // DbSet = Table trong Database
+    public DbSet&lt;Product&gt; Products { get; set; } = null!;
+    public DbSet&lt;Category&gt; Categories { get; set; } = null!;
+    
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+        // Fluent API configuration ở đây
+    }
+}</code></pre>
+    </div>
+
+    <!-- Slide 15 -->
+    <div class="slide">
+        <h2>Đăng ký DbContext trong Program.cs</h2>
+        <pre><code>// Program.cs
+var builder = WebApplication.CreateBuilder(args);
+
+// Đọc Connection String từ appsettings.json
+var connectionString = builder.Configuration
+    .GetConnectionString("DefaultConnection");
+
+// Đăng ký DbContext với DI Container
+builder.Services.AddDbContext&lt;AppDbContext&gt;(options =>
+    options.UseSqlServer(connectionString));
+
+// ... rest of code</code></pre>
+    </div>
+
+    <!-- Slide 16 -->
+    <div class="slide">
+        <h2>Connection String</h2>
+        <pre><code>// appsettings.json
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=.;Database=EShopDb;Trusted_Connection=True;TrustServerCertificate=True"
+  }
+}</code></pre>
+        <h4>Giải thích:</h4>
+        <ul>
+            <li><code>Server=.</code> — SQL Server trên máy local</li>
+            <li><code>Database=EShopDb</code> — Tên database</li>
+            <li><code>Trusted_Connection=True</code> — Windows Authentication</li>
+            <li><code>TrustServerCertificate=True</code> — Bỏ qua SSL warning (chỉ dùng dev)</li>
+        </ul>
+    </div>
+
+    <!-- Slide 17 -->
+    <div class="slide">
+        <h2>5. MIGRATIONS — TẠO & CẬP NHẬT DATABASE</h2>
+        <h3>Migrations là gì?</h3>
+        <p><strong>Migrations</strong> = Lịch sử thay đổi Database dưới dạng code.</p>
+        <h4>🏠 Ví dụ đời sống</h4>
+        <p>Migrations giống như <strong>Git cho Database</strong>:</p>
+        <ul>
+            <li><code>Add-Migration</code> = git commit</li>
+            <li><code>Update-Database</code> = git push</li>
+            <li>Có thể rollback về version trước</li>
+        </ul>
+    </div>
+
+    <!-- Slide 18 -->
+    <div class="slide">
+        <h2>Cài đặt EF Core Tools</h2>
+        <h3>Package Manager Console (Visual Studio)</h3>
+        <pre><code>Install-Package Microsoft.EntityFrameworkCore.Tools</code></pre>
+        <h3>.NET CLI (VS Code)</h3>
+        <pre><code>dotnet tool install --global dotnet-ef</code></pre>
+    </div>
+
+    <!-- Slide 19 -->
+    <div class="slide">
+        <h2>Tạo Migration đầu tiên</h2>
+        <h3>Package Manager Console:</h3>
+        <pre><code>Add-Migration InitialCreate</code></pre>
+        <h3>.NET CLI:</h3>
+        <pre><code>dotnet ef migrations add InitialCreate</code></pre>
+        <p><strong>Kết quả:</strong> Tạo folder <code>Migrations/</code> với file <code>XXXXXX_InitialCreate.cs</code></p>
+    </div>
+
+    <!-- Slide 20 -->
+    <div class="slide">
+        <h2>Apply Migration vào Database</h2>
+        <h3>Package Manager Console:</h3>
+        <pre><code>Update-Database</code></pre>
+        <h3>.NET CLI:</h3>
+        <pre><code>dotnet ef database update</code></pre>
+        <h4>Kết quả:</h4>
+        <ul>
+            <li>Database <code>EShopDb</code> được tạo</li>
+            <li>Bảng <code>Categories</code> và <code>Products</code> được tạo</li>
+            <li>Foreign Key được tạo</li>
+        </ul>
+    </div>
+
+    <!-- Slide 21 -->
+    <div class="slide">
+        <h2>Seed Data — Dữ liệu mẫu</h2>
+        <pre><code>protected override void OnModelCreating(ModelBuilder modelBuilder)
+{
+    base.OnModelCreating(modelBuilder);
+    
+    // Seed Categories
+    modelBuilder.Entity&lt;Category&gt;().HasData(
+        new Category { Id = 1, Name = "Electronics", CreatedAt = DateTime.Now },
+        new Category { Id = 2, Name = "Books", CreatedAt = DateTime.Now }
+    );
+}</code></pre>
+    </div>
+
+    <!-- Slide 22 -->
+    <div class="slide">
+        <h2>PHẦN 2: CRUD & RELATIONSHIPS</h2>
+        <h2>1. CREATE — TẠO DỮ LIỆU MỚI</h2>
+        <h3>1.1. Thêm 1 Entity</h3>
+        <pre><code>public async Task&lt;Product&gt; CreateProductAsync(Product product)
+{
+    product.CreatedAt = DateTime.UtcNow;
+    _context.Products.Add(product);
+    await _context.SaveChangesAsync();
+    return product;
+}</code></pre>
+    </div>
+
+    <!-- Slide 23 -->
+    <div class="slide">
+        <h2>1.2. Thêm nhiều Entities</h2>
+        <pre><code>public async Task CreateProductsAsync(List&lt;Product&gt; products)
+{
+    foreach (var product in products)
+    {
+        product.CreatedAt = DateTime.UtcNow;
+    }
+    
+    // AddRange hiệu quả hơn Add nhiều lần
+    _context.Products.AddRange(products);
+    await _context.SaveChangesAsync();
+}</code></pre>
+    </div>
+
+    <!-- Slide 24 -->
+    <div class="slide">
+        <h2>1.3. Thêm Entity với Relationship</h2>
+        <pre><code>public async Task&lt;Product&gt; CreateProductWithCategoryAsync(CreateProductRequest request)
+{
+    var category = await _context.Categories.FindAsync(request.CategoryId);
+    if (category == null)
+        throw new Exception("Category not found");
+    
+    var product = new Product
+    {
+        Name = request.Name,
+        Price = request.Price,
+        CategoryId = request.CategoryId,
+        CreatedAt = DateTime.UtcNow
+    };
+    
+    _context.Products.Add(product);
+    await _context.SaveChangesAsync();
+    return product;
+}</code></pre>
+    </div>
+
+    <!-- Slide 25 -->
+    <div class="slide">
+        <h2>2. READ — ĐỌC DỮ LIỆU</h2>
+        <h3>2.1. Lấy tất cả</h3>
+        <pre><code>// ❌ BAD: Load toàn bộ vào memory
+public List&lt;Product&gt; GetAllProducts()
+{
+    return _context.Products.ToList();
+}
+
+// ✅ GOOD: Async
+public async Task&lt;List&lt;Product&gt;&gt; GetAllProductsAsync()
+{
+    return await _context.Products.ToListAsync();
+}</code></pre>
+    </div>
+
+    <!-- Slide 26 -->
+    <div class="slide">
+        <h2>2.2. Lấy theo điều kiện (Where)</h2>
+        <pre><code>// Lấy sản phẩm còn hàng
+public async Task&lt;List&lt;Product&gt;&gt; GetInStockProductsAsync()
+{
+    return await _context.Products
+        .Where(p => p.Stock > 0)
+        .ToListAsync();
+}
+
+// Lấy sản phẩm theo category
+public async Task&lt;List&lt;Product&gt;&gt; GetProductsByCategoryAsync(int categoryId)
+{
+    return await _context.Products
+        .Where(p => p.CategoryId == categoryId)
+        .ToListAsync();
+}</code></pre>
+    </div>
+
+    <!-- Slide 27 -->
+    <div class="slide">
+        <h2>2.3. Lấy 1 entity</h2>
+        <h3>Find — Tìm theo Primary Key</h3>
+        <pre><code>public async Task&lt;Product?&gt; GetProductByIdAsync(int id)
+{
+    return await _context.Products.FindAsync(id);
+}</code></pre>
+        <h3>FirstOrDefault — Điều kiện phức tạp</h3>
+        <pre><code>public async Task&lt;Product?&gt; GetProductByNameAsync(string name)
+{
+    return await _context.Products
+        .FirstOrDefaultAsync(p => p.Name == name);
+}</code></pre>
+    </div>
+
+    <!-- Slide 28 -->
+    <div class="slide">
+        <h2>2.4. Phân trang</h2>
+        <pre><code>public async Task&lt;PagedResult&lt;Product&gt;&gt; GetProductsPagedAsync(
+    int pageNumber, int pageSize)
+{
+    var totalCount = await _context.Products.CountAsync();
+    
+    var products = await _context.Products
+        .OrderBy(p => p.Name)
+        .Skip((pageNumber - 1) * pageSize)
+        .Take(pageSize)
+        .ToListAsync();
+    
+    return new PagedResult&lt;Product&gt;
+    {
+        Items = products,
+        TotalCount = totalCount,
+        PageNumber = pageNumber,
+        PageSize = pageSize
+    };
+}</code></pre>
+    </div>
+
+    <!-- Slide 29 -->
+    <div class="slide">
+        <h2>2.5. Sắp xếp</h2>
+        <pre><code>// Sắp xếp tăng dần
+var products = await _context.Products
+    .OrderBy(p => p.Price)
+    .ToListAsync();
+
+// Sắp xếp giảm dần
+var products = await _context.Products
+    .OrderByDescending(p => p.CreatedAt)
+    .ToListAsync();
+
+// Sắp xếp nhiều trường
+var products = await _context.Products
+    .OrderBy(p => p.CategoryId)
+    .ThenByDescending(p => p.Price)
+    .ToListAsync();</code></pre>
+    </div>
+
+    <!-- Slide 30 -->
+    <div class="slide">
+        <h2>3. UPDATE — CẬP NHẬT DỮ LIỆU</h2>
+        <h3>3.1. Update cơ bản</h3>
+        <pre><code>public async Task&lt;Product&gt; UpdateProductAsync(int id, UpdateProductRequest request)
+{
+    var product = await _context.Products.FindAsync(id);
+    if (product == null)
+        throw new Exception("Product not found");
+    
+    product.Name = request.Name;
+    product.Price = request.Price;
+    product.Stock = request.Stock;
+    product.UpdatedAt = DateTime.UtcNow;
+    
+    await _context.SaveChangesAsync();
+    return product;
+}</code></pre>
+    </div>
+
+    <!-- Slide 31 -->
+    <div class="slide">
+        <h2>3.2. Update một phần (Patch)</h2>
+        <pre><code>public async Task UpdateProductStockAsync(int id, int newStock)
+{
+    var product = await _context.Products.FindAsync(id);
+    if (product == null)
+        throw new Exception("Product not found");
+    
+    product.Stock = newStock;
+    product.UpdatedAt = DateTime.UtcNow;
+    
+    await _context.SaveChangesAsync();
+}</code></pre>
+    </div>
+
+    <!-- Slide 32 -->
+    <div class="slide">
+        <h2>3.3. Update không cần load entity</h2>
+        <pre><code>public async Task UpdateProductAsync(Product product)
+{
+    _context.Products.Attach(product);
+    _context.Entry(product).State = EntityState.Modified;
+    await _context.SaveChangesAsync();
+}</code></pre>
+        <p><strong>Khi nào dùng:</strong> API nhận toàn bộ object từ client, không cần load từ DB.</p>
+    </div>
+
+    <!-- Slide 33 -->
+    <div class="slide">
+        <h2>4. DELETE — XÓA DỮ LIỆU</h2>
+        <h3>4.1. Delete cơ bản</h3>
+        <pre><code>public async Task DeleteProductAsync(int id)
+{
+    var product = await _context.Products.FindAsync(id);
+    if (product == null)
+        throw new Exception("Product not found");
+    
+    _context.Products.Remove(product);
+    await _context.SaveChangesAsync();
+}</code></pre>
+    </div>
+
+    <!-- Slide 34 -->
+    <div class="slide">
+        <h2>4.2. Delete không cần load (EF Core 7+)</h2>
+        <pre><code>public async Task DeleteProductAsync(int id)
+{
+    await _context.Products
+        .Where(p => p.Id == id)
+        .ExecuteDeleteAsync();
+}</code></pre>
+        <p><strong>Ưu điểm:</strong> Không cần load entity vào memory, execute SQL DELETE trực tiếp.</p>
+    </div>
+
+    <!-- Slide 35 -->
+    <div class="slide">
+        <h2>4.3. Soft Delete (Khuyến nghị)</h2>
+        <pre><code>public class Product
+{
+    public bool IsDeleted { get; set; } = false;
+    public DateTime? DeletedAt { get; set; }
+}
+
+public async Task SoftDeleteProductAsync(int id)
+{
+    var product = await _context.Products.FindAsync(id);
+    if (product == null)
+        throw new Exception("Product not found");
+    
+    product.IsDeleted = true;
+    product.DeletedAt = DateTime.UtcNow;
+    await _context.SaveChangesAsync();
+}</code></pre>
+    </div>
+
+    <!-- Slide 36 -->
+    <div class="slide">
+        <h2>Query chỉ lấy chưa xóa</h2>
+        <pre><code>public async Task&lt;List&lt;Product&gt;&gt; GetActiveProductsAsync()
+{
+    return await _context.Products
+        .Where(p => !p.IsDeleted)
+        .ToListAsync();
+}</code></pre>
+    </div>
+
+    <!-- Slide 37 -->
+    <div class="slide">
+        <h2>5. RELATIONSHIPS — QUAN HỆ GIỮA CÁC BẢNG</h2>
+        <h3>5.1. One-to-Many (1-N)</h3>
+        <pre><code>public class Category
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public ICollection&lt;Product&gt; Products { get; set; } = new List&lt;Product&gt;();
+}
+
+public class Product
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public int CategoryId { get; set; }
+    public Category Category { get; set; } = null!;
+}</code></pre>
+    </div>
+
+    <!-- Slide 38 -->
+    <div class="slide">
+        <h2>Fluent API cho 1-N</h2>
+        <pre><code>modelBuilder.Entity&lt;Product&gt;()
+    .HasOne(p => p.Category)
+    .WithMany(c => c.Products)
+    .HasForeignKey(p => p.CategoryId)
+    .OnDelete(DeleteBehavior.Restrict);</code></pre>
+    </div>
+
+    <!-- Slide 39 -->
+    <div class="slide">
+        <h2>Query với Include (Eager Loading)</h2>
+        <pre><code>// ❌ BAD: N+1 Query Problem
+public async Task&lt;List&lt;Product&gt;&gt; GetProductsAsync()
+{
+    var products = await _context.Products.ToListAsync();
+    foreach (var product in products)
+    {
+        var categoryName = product.Category.Name; // N queries!
+    }
+    return products;
+}
+
+// ✅ GOOD: Eager Loading
+public async Task&lt;List&lt;Product&gt;&gt; GetProductsAsync()
+{
+    return await _context.Products
+        .Include(p => p.Category)
+        .ToListAsync();
+}</code></pre>
+    </div>
+
+    <!-- Slide 40 -->
+    <div class="slide">
+        <h2>5.2. Many-to-Many (N-N)</h2>
+        <pre><code>public class Product
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public ICollection&lt;Tag&gt; Tags { get; set; } = new List&lt;Tag&gt;();
+}
+
+public class Tag
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public ICollection&lt;Product&gt; Products { get; set; } = new List&lt;Product&gt;();
+}</code></pre>
+    </div>
+
+    <!-- Slide 41 -->
+    <div class="slide">
+        <h2>Fluent API cho N-N</h2>
+        <pre><code>modelBuilder.Entity&lt;Product&gt;()
+    .HasMany(p => p.Tags)
+    .WithMany(t => t.Products);</code></pre>
+        <p>EF Core tự động tạo bảng junction <code>ProductTag</code>.</p>
+    </div>
+
+    <!-- Slide 42 -->
+    <div class="slide">
+        <h2>5.3. One-to-One (1-1)</h2>
+        <pre><code>public class User
+{
+    public int Id { get; set; }
+    public string Email { get; set; } = string.Empty;
+    public UserProfile? Profile { get; set; }
+}
+
+public class UserProfile
+{
+    public int Id { get; set; }
+    public int UserId { get; set; }
+    public User User { get; set; } = null!;
+    public string Bio { get; set; } = string.Empty;
+}</code></pre>
+    </div>
+
+    <!-- Slide 43 -->
+    <div class="slide">
+        <h2>Fluent API cho 1-1</h2>
+        <pre><code>modelBuilder.Entity&lt;User&gt;()
+    .HasOne(u => u.Profile)
+    .WithOne(p => p.User)
+    .HasForeignKey&lt;UserProfile&gt;(p => p.UserId);</code></pre>
+    </div>
+
+    <!-- Slide 44 -->
+    <div class="slide">
+        <h2>6. LOADING STRATEGIES</h2>
+        <h3>6.1. Eager Loading (Include) — ✅ Recommended</h3>
+        <pre><code>// Load Products với Categories trong 1 query
+var products = await _context.Products
+    .Include(p => p.Category)
+    .ToListAsync();
+
+// Multiple includes với nested include
+var orders = await _context.Orders
+    .Include(o => o.User)
+    .Include(o => o.OrderItems)
+        .ThenInclude(oi => oi.Product)
+    .ToListAsync();</code></pre>
+    </div>
+
+    <!-- Slide 45 -->
+    <div class="slide">
+        <h2>6.2. Explicit Loading</h2>
+        <pre><code>var product = await _context.Products.FindAsync(1);
+
+// Load Category sau
+await _context.Entry(product)
+    .Reference(p => p.Category)
+    .LoadAsync();
+
+// Load Collection
+var category = await _context.Categories.FindAsync(1);
+await _context.Entry(category)
+    .Collection(c => c.Products)
+    .LoadAsync();</code></pre>
+    </div>
+
+    <!-- Slide 46 -->
+    <div class="slide">
+        <h2>6.3. Lazy Loading (Không khuyến nghị)</h2>
+        <pre><code>// Cần cài package: Microsoft.EntityFrameworkCore.Proxies
+
+builder.Services.AddDbContext&lt;AppDbContext&gt;(options =>
+    options.UseSqlServer(connectionString)
+           .UseLazyLoadingProxies());
+
+// Entity với virtual keyword
+public class Product
+{
+    public int Id { get; set; }
+    public int CategoryId { get; set; }
+    public virtual Category Category { get; set; } = null!;
+}</code></pre>
+    </div>
+
+    <!-- Slide 47 -->
+    <div class="slide">
+        <h2>7. CASCADE DELETE</h2>
+        <pre><code>// Cascade - Xóa cả Products khi xóa Category
+modelBuilder.Entity&lt;Product&gt;()
+    .HasOne(p => p.Category)
+    .WithMany(c => c.Products)
+    .OnDelete(DeleteBehavior.Cascade);
+
+// Restrict - Không cho xóa Category nếu có Products
+modelBuilder.Entity&lt;Product&gt;()
+    .HasOne(p => p.Category)
+    .WithMany(c => c.Products)
+    .OnDelete(DeleteBehavior.Restrict);
+
+// SetNull - Set CategoryId = NULL khi xóa Category
+modelBuilder.Entity&lt;Product&gt;()
+    .HasOne(p => p.Category)
+    .WithMany(c => c.Products)
+    .OnDelete(DeleteBehavior.SetNull);</code></pre>
+    </div>
+
+    <!-- Slide 48 -->
+    <div class="slide">
+        <h2>8. PRODUCT SERVICE VÍ DỤ THỰC TẾ</h2>
+        <h3>CREATE</h3>
+        <pre><code>public async Task&lt;Product&gt; CreateAsync(CreateProductRequest request)
+{
+    var product = new Product
+    {
+        Name = request.Name,
+        Description = request.Description,
+        Price = request.Price,
+        Stock = request.Stock,
+        CategoryId = request.CategoryId,
+        CreatedAt = DateTime.UtcNow
+    };
+    
+    _context.Products.Add(product);
+    await _context.SaveChangesAsync();
+    return product;
+}</code></pre>
+    </div>
+
+    <!-- Slide 49 -->
+    <div class="slide">
+        <h2>READ - GetAll & GetById</h2>
+        <pre><code>public async Task&lt;List&lt;Product&gt;&gt; GetAllAsync()
+{
+    return await _context.Products
+        .Include(p => p.Category)
+        .Where(p => !p.IsDeleted)
+        .OrderBy(p => p.Name)
+        .ToListAsync();
+}
+
+public async Task&lt;Product?&gt; GetByIdAsync(int id)
+{
+    return await _context.Products
+        .Include(p => p.Category)
+        .FirstOrDefaultAsync(p => p.Id == id && !p.IsDeleted);
+}</code></pre>
+    </div>
+
+    <!-- Slide 50 -->
+    <div class="slide">
+        <h2>UPDATE</h2>
+        <pre><code>public async Task&lt;Product&gt; UpdateAsync(int id, UpdateProductRequest request)
+{
+    var product = await _context.Products.FindAsync(id);
+    if (product == null || product.IsDeleted)
+        throw new Exception("Product not found");
+    
+    product.Name = request.Name;
+    product.Description = request.Description;
+    product.Price = request.Price;
+    product.Stock = request.Stock;
+    product.UpdatedAt = DateTime.UtcNow;
+    
+    await _context.SaveChangesAsync();
+    return product;
+}</code></pre>
+    </div>
+
+    <!-- Slide 51 -->
+    <div class="slide">
+        <h2>DELETE (Soft)</h2>
+        <pre><code>public async Task DeleteAsync(int id)
+{
+    var product = await _context.Products.FindAsync(id);
+    if (product == null)
+        throw new Exception("Product not found");
+    
+    product.IsDeleted = true;
+    product.DeletedAt = DateTime.UtcNow;
+    
+    await _context.SaveChangesAsync();
+}</code></pre>
+    </div>
+
+    <!-- Slide 52 -->
+    <div class="slide">
+        <h2>SEARCH & FILTER</h2>
+        <pre><code>public async Task&lt;PagedResult&lt;Product&gt;&gt; SearchAsync(
+    string? searchTerm, int? categoryId, 
+    decimal? minPrice, decimal? maxPrice,
+    int pageNumber, int pageSize)
+{
+    var query = _context.Products
+        .Include(p => p.Category)
+        .Where(p => !p.IsDeleted)
+        .AsQueryable();
+    
+    if (!string.IsNullOrEmpty(searchTerm))
+        query = query.Where(p => p.Name.Contains(searchTerm));
+    
+    if (categoryId.HasValue)
+        query = query.Where(p => p.CategoryId == categoryId.Value);
+    
+    if (minPrice.HasValue)
+        query = query.Where(p => p.Price >= minPrice.Value);
+    
+    if (maxPrice.HasValue)
+        query = query.Where(p => p.Price <= maxPrice.Value);
+    
+    var totalCount = await query.CountAsync();
+    var products = await query
+        .OrderBy(p => p.Name)
+        .Skip((pageNumber - 1) * pageSize)
+        .Take(pageSize)
+        .ToListAsync();
+    
+    return new PagedResult&lt;Product&gt;
+    {
+        Items = products,
+        TotalCount = totalCount,
+        PageNumber = pageNumber,
+        PageSize = pageSize
+    };
+}</code></pre>
+    </div>
+
+    <!-- Slide 53 -->
+    <div class="slide">
+        <h2>9. BÀI TẬP THỰC HÀNH</h2>
+        <h3>📝 Bài 1: Implement Order CRUD</h3>
+        <p>Tạo <code>OrderService</code> với CRUD cho Order và OrderItems.</p>
+        <h3>📝 Bài 2: Tạo Entity User</h3>
+        <p>Tạo entity <code>User</code> với:</p>
+        <ul>
+            <li>Id (int, PK)</li>
+            <li>Email (string, required)</li>
+            <li>Password (string)</li>
+            <li>UserProfile (1-1 relationship)</li>
+        </ul>
+    </div>
+
+    <!-- Slide 54 -->
+    <div class="slide">
+        <h2>🧪 MINI TEST</h2>
+        <h3>1. Code First có nghĩa là gì?</h3>
+        <ul>
+            <li>A. Viết code SQL trước</li>
+            <li>B. Viết C# classes trước, Database tự tạo</li>
+            <li>C. Tạo Database trước, sau đó code</li>
+        </ul>
+        <h3>2. DbContext có vai trò gì?</h3>
+        <ul>
+            <li>A. Kết nối Database</li>
+            <li>B. Lưu trữ dữ liệu</li>
+            <li>C. Cả hai</li>
+        </ul>
+        <h3>3. Migration dùng để làm gì?</h3>
+        <ul>
+            <li>A. Tạo và cập nhật Database schema</li>
+            <li>B. Backup Database</li>
+            <li>C. Tối ưu performance</li>
+        </ul>
+    </div>
+
+    <!-- Slide 55 -->
+    <div class="slide">
+        <h2>🧪 ĐÁP ÁN</h2>
+        <h3>1. B — Viết C# classes trước, Database tự tạo</h3>
+        <h3>2. A — Kết nối Database</h3>
+        <h3>3. A — Tạo và cập nhật Database schema</h3>
+    </div>
+
+    <!-- Slide 56 -->
+    <div class="slide">
+        <h2>MINI TEST (PHẦN 2)</h2>
+        <h3>1. Eager Loading dùng method nào?</h3>
+        <ul>
+            <li>A. Load()</li>
+            <li>B. Include()</li>
+            <li>C. Join()</li>
+        </ul>
+        <h3>2. Soft Delete khác Hard Delete như thế nào?</h3>
+        <ul>
+            <li>A. Không khác</li>
+            <li>B. Soft Delete đánh dấu, Hard Delete xóa hẳn</li>
+            <li>C. Soft Delete nhanh hơn</li>
+        </ul>
+        <h3>3. N+1 Query Problem xảy ra khi nào?</h3>
+        <ul>
+            <li>A. Không dùng Include</li>
+            <li>B. Dùng quá nhiều Include</li>
+            <li>C. Query quá phức tạp</li>
+        </ul>
+    </div>
+
+    <!-- Slide 57 -->
+    <div class="slide">
+        <h2>🧪 ĐÁP ÁN (PHẦN 2)</h2>
+        <h3>1. B — Include()</h3>
+        <h3>2. B — Soft Delete đánh dấu IsDeleted=true, Hard Delete xóa khỏi DB</h3>
+        <h3>3. A — Không dùng Include → Mỗi lần access navigation property = 1 query mới</h3>
+    </div>
+
+    <!-- Slide 58 -->
+    <div class="slide">
+        <h2>📌 TÓM TẮT CHƯƠNG</h2>
+        <h3>✅ EF Core</h3>
+        <p>ORM giúp làm việc với Database bằng C# objects</p>
+        <h3>✅ Code First</h3>
+        <p>Viết code → Database tự tạo</p>
+        <h3>✅ Entity Classes</h3>
+        <p>Định nghĩa cấu trúc Database</p>
+        <h3>✅ DbContext</h3>
+        <p>Cổng kết nối Database</p>
+        <h3>✅ Migrations</h3>
+        <p>Quản lý lịch sử thay đổi Database</p>
+        <h3>✅ CRUD Operations</h3>
+        <p>Create, Read, Update, Delete dữ liệu</p>
+        <h3>✅ Relationships</h3>
+        <p>1-1, 1-N, N-N giữa các bảng</p>
+    </div>
+
+    <!-- Slide 59 -->
+    <div class="slide">
+        <h1>🎓 Cảm ơn!</h1>
+        <h2>Chúc bạn học tốt Entity Framework Core</h2>
+        <p style="margin-top: 40px; font-size: 1.3rem;">
+            Hãy thực hành các bài tập và ứng dụng những kiến thức này vào dự án E-Shop của bạn.
+        </p>
+    </div>
+
+    <!-- Slide Counter -->
+    <div class="slide-counter">
+        <span id="current-slide">1</span> / <span id="total-slides">59</span>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+        <button id="prev-btn" onclick="previousSlide()">← Prev</button>
+        <button id="next-btn" onclick="nextSlide()">Next →</button>
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = document.querySelectorAll('.slide').length;
+        document.getElementById('total-slides').textContent = totalSlides;
+
+        function showSlide(n) {
+            const slides = document.querySelectorAll('.slide');
+            
+            if (n > totalSlides) {
+                currentSlide = totalSlides;
+            }
+            if (n < 1) {
+                currentSlide = 1;
+            }
+            
+            slides.forEach(slide => slide.classList.remove('active'));
+            slides[currentSlide - 1].classList.add('active');
+            
+            document.getElementById('current-slide').textContent = currentSlide;
+            
+            // Update button states
+            document.getElementById('prev-btn').disabled = currentSlide === 1;
+            document.getElementById('next-btn').disabled = currentSlide === totalSlides;
+        }
+
+        function nextSlide() {
+            currentSlide++;
+            showSlide(currentSlide);
+            window.scrollTo(0, 0);
+        }
+
+        function previousSlide() {
+            currentSlide--;
+            showSlide(currentSlide);
+            window.scrollTo(0, 0);
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft') previousSlide();
+        });
+
+        // Initialize
+        showSlide(currentSlide);
+    </script>
+</body>
+</html>
+</code></pre>
